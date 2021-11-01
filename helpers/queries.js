@@ -9,7 +9,7 @@ const getCiudad = async (nombre) => {
         url: 'https://spott.p.rapidapi.com/places/autocomplete',
         method: 'GET',
         params: {
-            limit:10,
+            limit: 5,
             q: nombre,
             type: 'CITY',
         },
@@ -20,11 +20,15 @@ const getCiudad = async (nombre) => {
     };
     try {
         const { data } = await axios(parametros);
-        return data.map((el) =>({
-            nombre: `${el.name}, ${el.adminDivision1.name}, ${el.country.name}`,
-            lan: el.coordinates.latitude,
-            lon: el.coordinates.longitude,
-        }));
+        if (data.length !== 0) {
+            return data.map((el, index) =>({
+                id: index + 1,
+                nombre: `${el.name}, ${el.adminDivision1.name}, ${el.country.name}`,
+                lat: el.coordinates.latitude,
+                lon: el.coordinates.longitude,
+            }));
+        }
+        return [{nombre: 'No se encontraron resultados', id: 0 }];
     } catch (Error) {
         console.log(Error);
     }
