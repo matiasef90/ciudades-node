@@ -50,14 +50,7 @@ const optionCiudades = async(ciudades) => {
     if (id !== 0) {
         const ciudad = ciudades.find((el) => id === el.id);
         const clima = await getWeather(ciudad.lat, ciudad.lon);
-        return `
-        Ciudad: ${ciudad.nombre}
-        Clima: ${clima.description}
-        Temp. Max.: ${clima.temp_max}
-        Temp. Min.: ${clima.temp_min}
-        Latitud: ${ciudad.lat}
-        Longitud: ${ciudad.lon}
-        `
+        return {...ciudad, ...clima};
     }
     return null;
 };

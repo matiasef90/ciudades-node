@@ -36,7 +36,7 @@ const getCiudad = async (nombre) => {
 
 const getWeather = async (lat, lon) => {
     const parametros = {
-        url: 'api.openweathermap.org/data/2.5/weather',
+        url: 'http://api.openweathermap.org/data/2.5/weather',
         method: 'GET',
         params: {
             lat,
@@ -48,14 +48,11 @@ const getWeather = async (lat, lon) => {
     };
     try {
         const { data } = await axios(parametros);
-        return data.map((el) =>({
-            description: el.weather[0].description
-                .split(' ')
-                .map((el) => el.toCapitalize())
-                .join(' '),
-            temp_max: el.main.temp_max,
-            temp_min: el.main.temp_min,
-        }));
+        return {
+            description: data.weather[0].description,
+            temp_max: data.main.temp_max,
+            temp_min: data.main.temp_min,
+        };
     } catch (Error) {
         console.log(Error);
     }
