@@ -56,6 +56,8 @@ const ciudadApp = (async() => {
                 break;
             }
     } while (menuOption !== 0);
+    const dir = './db';
+    if(!fs.existsSync(dir)) fs.mkdirSync(dir);
     fs.writeFileSync('./db/historial.txt', JSON.stringify(historial));
     console.clear();
 })();
