@@ -29,10 +29,11 @@ const menu = async() => {
     const option = {
         type: 'list',
         name: 'menu',
+        message: 'OPCIONES',
         choices: [
-            {name: '1. Buscar Ciudad', value: 1},
-            {name: '2. Historial', value: 2},
-            {name: '0. Salir', value: 0},
+            {name: '1. '.green + 'Buscar Ciudad'.white, value: 1},
+            {name: '2. '.green + 'Historial'.white, value: 2},
+            {name: '0. '.green + 'Salir'.white, value: 0},
         ]
     }
     const { menu } = await inquirer.prompt(option);
@@ -44,20 +45,40 @@ const optionCiudades = async(ciudades) => {
     const option = {
         type: 'list',
         name: 'id',
+        message: 'Selecciona una ciudad'.blue,
         choices
     }
     const { id } = await inquirer.prompt(option);
     if (id !== 0) {
         const ciudad = ciudades.find((el) => id === el.id);
         const clima = await getWeather(ciudad.lat, ciudad.lon);
-        return {...ciudad, ...clima};
+        return { ...ciudad, ...clima, status: true };
     }
-    return null;
+    return { status: false };
+};
+
+const ciudadHistorial = async (historial) => {
+    const choices = historial.map((el, idx) => ({name: `${idx+1}. `.green + `${el}`.white, value: el }));
+    choices.unshift({ name: '0. '.green + 'Salir'.white, value: 0 });
+    const option = {
+        type: 'list',
+        name: 'lugar',
+        message: 'Selecciona una opcion'.blue,
+        choices,
+    }
+    const { lugar } = await inquirer.prompt(option);
+    if(lugar !== 0) {
+        const ciudad = await getCiudad(lugar);
+        const clima = await getWeather(ciudad[0].lat, ciudad[0].lon);
+        return {...ciudad[0], ...clima, status: true};
+    }
+    return {status: false};
 };
 
 module.exports= {
     pausa,
     inputCiudad,
     menu,
-    optionCiudades
+    optionCiudades,
+    ciudadHistorial
 }

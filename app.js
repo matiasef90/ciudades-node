@@ -1,8 +1,14 @@
-const { inputCiudad, pausa, menu, optionCiudades } = require('./helpers/inquirer');
-const { getCiudad, getWeather } = require('./helpers/queries');
+const { inputCiudad, pausa, menu, optionCiudades, ciudadHistorial } = require('./helpers/inquirer');
+const fs = require('fs');
 require('colors');
 
 const ciudadApp = (async() => {
+    let historial = [];
+    const dataBase = fs.existsSync('./db/historial.txt');
+    if(dataBase) {
+        data = fs.readFileSync('./db/historial.txt');
+        historial = JSON.parse(data);
+    }
     let menuOption;
     do {
         console.clear();
@@ -20,19 +26,36 @@ const ciudadApp = (async() => {
                     temp_min,
                     lat,
                     lon,
+                    status,
                 } = await optionCiudades(ciudades);
-                console.log(`Ciudad: ${nombre}`);
-                console.log(`Clima: ${description}`);
-                console.log(`Maxima: ${temp_max}`);
-                console.log(`Mínima: ${temp_min}`);
-                console.log(`Latitud: ${lat}`);
-                console.log(`Longitud: ${lon}`);
-                await pausa();
+                if(status) {
+                    console.log(`${'Ciudad:'.green} ${nombre}`.white);
+                    console.log(`${'Clima:'.green} ${description}`.white);
+                    console.log(`${'Maxima:'.green} ${temp_max}`.white);
+                    console.log(`${'Mínima:'.green} ${temp_min}`.white);
+                    console.log(`${'Latitud:'.green} ${lat}`.white);
+                    console.log(`${'Longitud:'.green} ${lon}`.white);
+                    if(historial.length === 6) historial.pop()
+                    historial.unshift(nombre);
+                    await pausa();
+                }
                 break;
             case 2:
-                const response = await getWeather(-33,-68);
-                console.log(response);
+                const ciudadHist = await ciudadHistorial(historial);
+                if(ciudadHist.status) {
+                    console.log(`${'Ciudad:'.green} ${ciudadHist.nombre}`.white);
+                    console.log(`${'Clima:'.green} ${ciudadHist.description}`.white);
+                    console.log(`${'Maxima:'.green} ${ciudadHist.temp_max}`.white);
+                    console.log(`${'Mínima:'.green} ${ciudadHist.temp_min}`.white);
+                    console.log(`${'Latitud:'.green} ${ciudadHist.lat}`.white);
+                    console.log(`${'Longitud:'.green} ${ciudadHist.lon}`.white);
+                    await pausa();
+                }
+                break;
+            default:
+                break;
             }
     } while (menuOption !== 0);
+    fs.writeFileSync('./db/historial.txt', JSON.stringify(historial));
     console.clear();
 })();
